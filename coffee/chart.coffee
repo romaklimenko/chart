@@ -26,7 +26,7 @@ class App.Chart
   renderPath = ->
     X = width() / App.Model.length
     max = Math.max.apply(Math, App.Model)
-    Y = height() / max
+    Y = (height() - 10) / max
 
     path = paper.path().attr
       stroke: "#009874"
@@ -36,6 +36,9 @@ class App.Chart
     for i in [0..App.Model.length - 1]
       y = Math.round(height() - Y * App.Model[i])
       x = Math.round(X * (i + .5))
+
+      renderPoint x, y
+
       if i is 0
         p = ["M", x, y, "C", x, y]
 
@@ -46,14 +49,16 @@ class App.Chart
         X2 = Math.round(X * (i + 1.5))
 
         a = getAnchors(X0, Y0, x, y, X2, Y2)
-        console.log a
         p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2])
 
     p = p.concat([x, y, x, y]) # the last one
     path.attr({path: p})
 
   renderPoint = (x, y) ->
-    #
+    circle = paper.circle(x, y, 5).attr
+      fill: "#FFF"
+      stroke: "#009874"
+      "stroke-width": 4
 
   height = ->
     innerHeight - 70

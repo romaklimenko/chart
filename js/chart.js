@@ -37,7 +37,7 @@
       var X, X0, X2, Y, Y0, Y2, a, i, max, p, path, x, y, _i, _ref;
       X = width() / App.Model.length;
       max = Math.max.apply(Math, App.Model);
-      Y = height() / max;
+      Y = (height() - 10) / max;
       path = paper.path().attr({
         stroke: "#009874",
         "stroke-width": 4,
@@ -46,6 +46,7 @@
       for (i = _i = 0, _ref = App.Model.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
         y = Math.round(height() - Y * App.Model[i]);
         x = Math.round(X * (i + .5));
+        renderPoint(x, y);
         if (i === 0) {
           p = ["M", x, y, "C", x, y];
         }
@@ -55,7 +56,6 @@
           Y2 = Math.round(height() - Y * App.Model[i + 1]);
           X2 = Math.round(X * (i + 1.5));
           a = getAnchors(X0, Y0, x, y, X2, Y2);
-          console.log(a);
           p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
         }
       }
@@ -65,7 +65,14 @@
       });
     };
 
-    renderPoint = function(x, y) {};
+    renderPoint = function(x, y) {
+      var circle;
+      return circle = paper.circle(x, y, 5).attr({
+        fill: "#FFF",
+        stroke: "#009874",
+        "stroke-width": 4
+      });
+    };
 
     height = function() {
       return innerHeight - 70;
