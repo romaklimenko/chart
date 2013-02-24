@@ -36,6 +36,7 @@
     renderDot = function(x, y, index) {
       var Y, circle, max;
       circle = paper.circle(x, y, 15).attr({
+        'cursor': 'move',
         fill: "#FFF",
         stroke: "#009874",
         "stroke-width": 4
@@ -46,11 +47,11 @@
       }
       this.circles.push(circle);
       y = void 0;
-      max = Math.max.apply(Math, App.Model);
+      max = 100;
       Y = height() / max;
       return circle.drag(function(dx, dy) {
         var _y;
-        _y = Math.min(Math.max(y + dy, 0), height());
+        _y = Math.min(Math.max(y + dy, 15), height() - 15);
         App.Model[this.data('index')] = Math.round(max - (_y / Y));
         this.attr({
           cy: Math.round(height() - Y * App.Model[this.data('index')])
@@ -76,7 +77,7 @@
         }
       }
       X = width() / App.Model.length;
-      max = Math.max.apply(Math, App.Model);
+      max = 100;
       Y = height() / max;
       _results = [];
       for (i = _j = 0, _ref1 = App.Model.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
@@ -90,7 +91,7 @@
     renderPath = function() {
       var X, X0, X2, Y, Y0, Y2, a, i, max, p, x, y, _i, _ref, _ref1;
       X = width() / App.Model.length;
-      max = Math.max.apply(Math, App.Model);
+      max = 100;
       Y = height() / max;
       if ((_ref = this.path) != null) {
         _ref.remove();
@@ -133,7 +134,7 @@
       if (paper != null) {
         paper.remove();
       }
-      paper = new Raphael('chart', width(), height() + 20);
+      paper = new Raphael('chart', width(), height());
       renderPath();
       return renderDots();
     };

@@ -25,6 +25,7 @@ class App.Chart
 
   renderDot = (x, y, index) ->
     circle = paper.circle(x, y, 15).attr
+      'cursor': 'move'
       fill: "#FFF"
       stroke: "#009874"
       "stroke-width": 4
@@ -36,15 +37,15 @@ class App.Chart
 
     y = undefined
 
-    max = Math.max.apply(Math, App.Model)
+    max = 100
     Y = height() / max
     circle.drag(
       # onmove
       (dx, dy) ->
-        _y = Math.min(Math.max(y + dy, 0), height())
+        _y = Math.min(Math.max(y + dy, 15), height() - 15)
         App.Model[@data('index')] = Math.round(max - (_y / Y))
         @attr
-          cy: Math.round(height() - Y * App.Model[@data('index')]) # FIXME: Code duplicate
+          cy: Math.round(height() - Y * App.Model[@data('index')])
         App.Model[@data('index')] = Math.round(max - (@attr('cy') / Y))
         $('#model').html(JSON.stringify(App.Model))
         renderPath()
@@ -60,7 +61,7 @@ class App.Chart
   renderDots = ->
     circle.remove() for circle in @circles if @circles
     X = width() / App.Model.length
-    max = Math.max.apply(Math, App.Model)
+    max = 100
     Y = height() / max
 
     for i in [0..App.Model.length - 1]
@@ -71,7 +72,7 @@ class App.Chart
 
   renderPath = ->
     X = width() / App.Model.length
-    max = Math.max.apply(Math, App.Model)
+    max = 100
     Y = height() / max
 
     @path?.remove()
@@ -112,6 +113,6 @@ class App.Chart
     paper = new Raphael(
       'chart',
       width(),
-      height() + 20)
+      height())
     renderPath()
     renderDots()
