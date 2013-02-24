@@ -24,7 +24,7 @@ class App.Chart
     }
 
   renderDot = (x, y, index) ->
-    circle = paper.circle(x, y, 5).attr
+    circle = paper.circle(x, y, 15).attr
       fill: "#FFF"
       stroke: "#009874"
       "stroke-width": 4
@@ -37,7 +37,7 @@ class App.Chart
     y = undefined
 
     max = Math.max.apply(Math, App.Model)
-    Y = (height()) / max
+    Y = height() / max
     circle.drag(
       # onmove
       (dx, dy) ->
@@ -112,6 +112,6 @@ class App.Chart
     paper = new Raphael(
       'chart',
       width(),
-      height())
+      height() + 20)
     renderPath()
     renderDots()

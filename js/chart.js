@@ -35,7 +35,7 @@
 
     renderDot = function(x, y, index) {
       var Y, circle, max;
-      circle = paper.circle(x, y, 5).attr({
+      circle = paper.circle(x, y, 15).attr({
         fill: "#FFF",
         stroke: "#009874",
         "stroke-width": 4
@@ -47,7 +47,7 @@
       this.circles.push(circle);
       y = void 0;
       max = Math.max.apply(Math, App.Model);
-      Y = (height()) / max;
+      Y = height() / max;
       return circle.drag(function(dx, dy) {
         var _y;
         _y = Math.min(Math.max(y + dy, 0), height());
@@ -133,7 +133,7 @@
       if (paper != null) {
         paper.remove();
       }
-      paper = new Raphael('chart', width(), height());
+      paper = new Raphael('chart', width(), height() + 20);
       renderPath();
       return renderDots();
     };
