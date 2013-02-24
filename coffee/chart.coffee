@@ -31,15 +31,20 @@ class App.Chart
 
     circle.data('index', index)
 
+    @circles = [] if not @circles
+    @circles.push(circle)
+
     y = undefined
 
     max = Math.max.apply(Math, App.Model)
-    Y = (height() - 10) / max
+    Y = (height()) / max
     circle.drag(
       # onmove
       (dx, dy) ->
+        _y = Math.min(Math.max(y + dy, 0), height())
+        App.Model[@data('index')] = Math.round(max - (_y / Y))
         @attr
-          cy: Math.min(Math.max(y + dy, 0), height() - 10) # FIXME: Code duplicate
+          cy: Math.round(height() - Y * App.Model[@data('index')]) # FIXME: Code duplicate
         App.Model[@data('index')] = Math.round(max - (@attr('cy') / Y))
         $('#model').html(JSON.stringify(App.Model))
         renderPath()
@@ -53,9 +58,10 @@ class App.Chart
       )
 
   renderDots = ->
+    circle.remove() for circle in @circles if @circles
     X = width() / App.Model.length
     max = Math.max.apply(Math, App.Model)
-    Y = (height() - 10) / max
+    Y = height() / max
 
     for i in [0..App.Model.length - 1]
       y = Math.round(height() - Y * App.Model[i])
@@ -66,7 +72,7 @@ class App.Chart
   renderPath = ->
     X = width() / App.Model.length
     max = Math.max.apply(Math, App.Model)
-    Y = (height() - 10) / max
+    Y = height() / max
 
     @path?.remove()
 
@@ -92,7 +98,7 @@ class App.Chart
         p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2])
 
     p = p.concat([x, y, x, y]) # the last one
-    @path.attr({path: p})
+    @path.attr({path: p}).toBack()
 
   height = ->
     innerHeight - 70

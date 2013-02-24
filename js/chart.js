@@ -41,12 +41,19 @@
         "stroke-width": 4
       });
       circle.data('index', index);
+      if (!this.circles) {
+        this.circles = [];
+      }
+      this.circles.push(circle);
       y = void 0;
       max = Math.max.apply(Math, App.Model);
-      Y = (height() - 10) / max;
+      Y = (height()) / max;
       return circle.drag(function(dx, dy) {
+        var _y;
+        _y = Math.min(Math.max(y + dy, 0), height());
+        App.Model[this.data('index')] = Math.round(max - (_y / Y));
         this.attr({
-          cy: Math.min(Math.max(y + dy, 0), height() - 10)
+          cy: Math.round(height() - Y * App.Model[this.data('index')])
         });
         App.Model[this.data('index')] = Math.round(max - (this.attr('cy') / Y));
         $('#model').html(JSON.stringify(App.Model));
@@ -60,12 +67,19 @@
     };
 
     renderDots = function() {
-      var X, Y, i, max, x, y, _i, _ref, _results;
+      var X, Y, circle, i, max, x, y, _i, _j, _len, _ref, _ref1, _results;
+      if (this.circles) {
+        _ref = this.circles;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          circle = _ref[_i];
+          circle.remove();
+        }
+      }
       X = width() / App.Model.length;
       max = Math.max.apply(Math, App.Model);
-      Y = (height() - 10) / max;
+      Y = height() / max;
       _results = [];
-      for (i = _i = 0, _ref = App.Model.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      for (i = _j = 0, _ref1 = App.Model.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
         y = Math.round(height() - Y * App.Model[i]);
         x = Math.round(X * (i + .5));
         _results.push(renderDot(x, y, i));
@@ -77,7 +91,7 @@
       var X, X0, X2, Y, Y0, Y2, a, i, max, p, x, y, _i, _ref, _ref1;
       X = width() / App.Model.length;
       max = Math.max.apply(Math, App.Model);
-      Y = (height() - 10) / max;
+      Y = height() / max;
       if ((_ref = this.path) != null) {
         _ref.remove();
       }
@@ -104,7 +118,7 @@
       p = p.concat([x, y, x, y]);
       return this.path.attr({
         path: p
-      });
+      }).toBack();
     };
 
     height = function() {
