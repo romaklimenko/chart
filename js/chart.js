@@ -2,7 +2,7 @@
 (function() {
 
   App.Chart = (function() {
-    var getAnchors, height, paper, renderPath, renderPoint, width;
+    var getAnchors, height, paper, renderDot, renderDots, renderPath, width;
 
     function Chart() {}
 
@@ -33,20 +33,62 @@
       };
     };
 
-    renderPath = function() {
-      var X, X0, X2, Y, Y0, Y2, a, i, max, p, path, x, y, _i, _ref;
+    renderDot = function(x, y, index) {
+      var Y, circle, max;
+      circle = paper.circle(x, y, 5).attr({
+        fill: "#FFF",
+        stroke: "#009874",
+        "stroke-width": 4
+      });
+      circle.data('index', index);
+      y = void 0;
+      max = Math.max.apply(Math, App.Model);
+      Y = (height() - 10) / max;
+      return circle.drag(function(dx, dy) {
+        this.attr({
+          cy: Math.min(Math.max(y + dy, 0), height() - 10)
+        });
+        App.Model[this.data('index')] = Math.round(max - (this.attr('cy') / Y));
+        $('#model').html(JSON.stringify(App.Model));
+        return renderPath();
+      }, function() {
+        return y = this.attr("cy");
+      }, function() {
+        renderPath();
+        return renderDots();
+      });
+    };
+
+    renderDots = function() {
+      var X, Y, i, max, x, y, _i, _ref, _results;
       X = width() / App.Model.length;
       max = Math.max.apply(Math, App.Model);
       Y = (height() - 10) / max;
-      path = paper.path().attr({
+      _results = [];
+      for (i = _i = 0, _ref = App.Model.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        y = Math.round(height() - Y * App.Model[i]);
+        x = Math.round(X * (i + .5));
+        _results.push(renderDot(x, y, i));
+      }
+      return _results;
+    };
+
+    renderPath = function() {
+      var X, X0, X2, Y, Y0, Y2, a, i, max, p, x, y, _i, _ref, _ref1;
+      X = width() / App.Model.length;
+      max = Math.max.apply(Math, App.Model);
+      Y = (height() - 10) / max;
+      if ((_ref = this.path) != null) {
+        _ref.remove();
+      }
+      this.path = paper.path().attr({
         stroke: "#009874",
         "stroke-width": 4,
         "stroke-linejoin": "round"
       });
-      for (i = _i = 0, _ref = App.Model.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      for (i = _i = 0, _ref1 = App.Model.length - 1; 0 <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
         y = Math.round(height() - Y * App.Model[i]);
         x = Math.round(X * (i + .5));
-        renderPoint(x, y);
         if (i === 0) {
           p = ["M", x, y, "C", x, y];
         }
@@ -60,17 +102,8 @@
         }
       }
       p = p.concat([x, y, x, y]);
-      return path.attr({
+      return this.path.attr({
         path: p
-      });
-    };
-
-    renderPoint = function(x, y) {
-      var circle;
-      return circle = paper.circle(x, y, 5).attr({
-        fill: "#FFF",
-        stroke: "#009874",
-        "stroke-width": 4
       });
     };
 
@@ -83,11 +116,12 @@
     };
 
     Chart.prototype.render = function() {
-      if (paper) {
+      if (paper != null) {
         paper.remove();
       }
       paper = new Raphael('chart', width(), height());
-      return renderPath();
+      renderPath();
+      return renderDots();
     };
 
     return Chart;

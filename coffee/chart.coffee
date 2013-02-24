@@ -23,12 +23,54 @@ class App.Chart
       y2: p2y + dy2
     }
 
+  renderDot = (x, y, index) ->
+    circle = paper.circle(x, y, 5).attr
+      fill: "#FFF"
+      stroke: "#009874"
+      "stroke-width": 4
+
+    circle.data('index', index)
+
+    y = undefined
+
+    max = Math.max.apply(Math, App.Model)
+    Y = (height() - 10) / max
+    circle.drag(
+      # onmove
+      (dx, dy) ->
+        @attr
+          cy: Math.min(Math.max(y + dy, 0), height() - 10) # FIXME: Code duplicate
+        App.Model[@data('index')] = Math.round(max - (@attr('cy') / Y))
+        $('#model').html(JSON.stringify(App.Model))
+        renderPath()
+      # onstart
+      ->
+        y = @attr("cy")
+      # onend
+      ->
+        renderPath()
+        renderDots()
+      )
+
+  renderDots = ->
+    X = width() / App.Model.length
+    max = Math.max.apply(Math, App.Model)
+    Y = (height() - 10) / max
+
+    for i in [0..App.Model.length - 1]
+      y = Math.round(height() - Y * App.Model[i])
+      x = Math.round(X * (i + .5))
+
+      renderDot x, y, i
+
   renderPath = ->
     X = width() / App.Model.length
     max = Math.max.apply(Math, App.Model)
     Y = (height() - 10) / max
 
-    path = paper.path().attr
+    @path?.remove()
+
+    @path = paper.path().attr
       stroke: "#009874"
       "stroke-width": 4
       "stroke-linejoin": "round"
@@ -36,8 +78,6 @@ class App.Chart
     for i in [0..App.Model.length - 1]
       y = Math.round(height() - Y * App.Model[i])
       x = Math.round(X * (i + .5))
-
-      renderPoint x, y
 
       if i is 0
         p = ["M", x, y, "C", x, y]
@@ -52,13 +92,7 @@ class App.Chart
         p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2])
 
     p = p.concat([x, y, x, y]) # the last one
-    path.attr({path: p})
-
-  renderPoint = (x, y) ->
-    circle = paper.circle(x, y, 5).attr
-      fill: "#FFF"
-      stroke: "#009874"
-      "stroke-width": 4
+    @path.attr({path: p})
 
   height = ->
     innerHeight - 70
@@ -68,9 +102,10 @@ class App.Chart
 
   # public functions
   render: ->
-    paper.remove() if paper
+    paper?.remove()
     paper = new Raphael(
       'chart',
       width(),
       height())
     renderPath()
+    renderDots()
