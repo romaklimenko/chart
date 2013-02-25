@@ -1,4 +1,6 @@
 chart
 =====
 
-The simple as possible interactive linechart
+Simple as possible interactive linechart with draggable points.
+
+http://romaklimenko.com/chart/
