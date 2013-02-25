@@ -24,27 +24,36 @@ class App.Chart
     }
 
   renderDot = (x, y, index) ->
-    circle = paper.circle(x, y, 15).attr
-      'cursor': 'move'
+    innerCircle = paper.circle(x, y, 5).attr
+      "cursor": "move"
       fill: "#FFF"
       stroke: "#009874"
       "stroke-width": 4
 
-    circle.data('index', index)
+    outerCircle = paper.circle(x, y, 30).attr
+      'cursor': 'move'
+      fill: "transparent"
+      stroke: "none"
+
+    outerCircle.innerCircle = innerCircle
+
+    outerCircle.data('index', index)
 
     @circles = [] if not @circles
-    @circles.push(circle)
+    @circles.push(outerCircle)
 
     y = undefined
 
     max = 100
     Y = height() / max
-    circle.drag(
+    outerCircle.drag(
       # onmove
       (dx, dy) ->
         _y = Math.min(Math.max(y + dy, 15), height() - 15)
         App.Model[@data('index')] = Math.round(max - (_y / Y))
         @attr
+          cy: Math.round(height() - Y * App.Model[@data('index')])
+        @innerCircle.attr
           cy: Math.round(height() - Y * App.Model[@data('index')])
         App.Model[@data('index')] = Math.round(max - (@attr('cy') / Y))
         $('#model').html(JSON.stringify(App.Model))
@@ -59,7 +68,11 @@ class App.Chart
       )
 
   renderDots = ->
-    circle.remove() for circle in @circles if @circles
+    if @circles
+      for circle in @circles
+        circle?.innerCircle?.remove()
+        circle?.remove()
+
     X = width() / App.Model.length
     max = 100
     Y = height() / max

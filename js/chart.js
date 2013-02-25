@@ -34,26 +34,35 @@
     };
 
     renderDot = function(x, y, index) {
-      var Y, circle, max;
-      circle = paper.circle(x, y, 15).attr({
-        'cursor': 'move',
+      var Y, innerCircle, max, outerCircle;
+      innerCircle = paper.circle(x, y, 5).attr({
+        "cursor": "move",
         fill: "#FFF",
         stroke: "#009874",
         "stroke-width": 4
       });
-      circle.data('index', index);
+      outerCircle = paper.circle(x, y, 30).attr({
+        'cursor': 'move',
+        fill: "transparent",
+        stroke: "none"
+      });
+      outerCircle.innerCircle = innerCircle;
+      outerCircle.data('index', index);
       if (!this.circles) {
         this.circles = [];
       }
-      this.circles.push(circle);
+      this.circles.push(outerCircle);
       y = void 0;
       max = 100;
       Y = height() / max;
-      return circle.drag(function(dx, dy) {
+      return outerCircle.drag(function(dx, dy) {
         var _y;
         _y = Math.min(Math.max(y + dy, 15), height() - 15);
         App.Model[this.data('index')] = Math.round(max - (_y / Y));
         this.attr({
+          cy: Math.round(height() - Y * App.Model[this.data('index')])
+        });
+        this.innerCircle.attr({
           cy: Math.round(height() - Y * App.Model[this.data('index')])
         });
         App.Model[this.data('index')] = Math.round(max - (this.attr('cy') / Y));
@@ -68,19 +77,26 @@
     };
 
     renderDots = function() {
-      var X, Y, circle, i, max, x, y, _i, _j, _len, _ref, _ref1, _results;
+      var X, Y, circle, i, max, x, y, _i, _j, _len, _ref, _ref1, _ref2, _results;
       if (this.circles) {
         _ref = this.circles;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           circle = _ref[_i];
-          circle.remove();
+          if (circle != null) {
+            if ((_ref1 = circle.innerCircle) != null) {
+              _ref1.remove();
+            }
+          }
+          if (circle != null) {
+            circle.remove();
+          }
         }
       }
       X = width() / App.Model.length;
       max = 100;
       Y = height() / max;
       _results = [];
-      for (i = _j = 0, _ref1 = App.Model.length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; i = 0 <= _ref1 ? ++_j : --_j) {
+      for (i = _j = 0, _ref2 = App.Model.length - 1; 0 <= _ref2 ? _j <= _ref2 : _j >= _ref2; i = 0 <= _ref2 ? ++_j : --_j) {
         y = Math.round(height() - Y * App.Model[i]);
         x = Math.round(X * (i + .5));
         _results.push(renderDot(x, y, i));
