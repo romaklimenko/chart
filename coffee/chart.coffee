@@ -55,6 +55,7 @@ class App.Chart
           cy: Math.round(height() - Y * App.Model[@data('index')])
         @innerCircle.attr
           cy: Math.round(height() - Y * App.Model[@data('index')])
+        @innerCircle.toFront()
         App.Model[@data('index')] = Math.round(max - (@attr('cy') / Y))
         $('#model').html(JSON.stringify(App.Model))
         renderPath()
@@ -89,11 +90,17 @@ class App.Chart
     Y = height() / max
 
     @path?.remove()
+    @bgpath?.remove()
 
     @path = paper.path().attr
       stroke: "#009874"
       "stroke-width": 4
       "stroke-linejoin": "round"
+
+    @bgpath = paper.path().attr
+      stroke: "none"
+      opacity: .3
+      fill: "#009874"
 
     for i in [0..App.Model.length - 1]
       y = Math.round(height() - Y * App.Model[i])
@@ -101,6 +108,7 @@ class App.Chart
 
       if i is 0
         p = ["M", x, y, "C", x, y]
+        bgpp = ["M", X * .5, height(), "L", x, y, "C", x, y];
 
       if i isnt 0 and i < App.Model.length - 1
         Y0 = Math.round(height() - Y * App.Model[i - 1])
@@ -110,9 +118,12 @@ class App.Chart
 
         a = getAnchors(X0, Y0, x, y, X2, Y2)
         p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2])
+        bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2])
 
     p = p.concat([x, y, x, y]) # the last one
     @path.attr({path: p}).toBack()
+    bgpp = bgpp.concat([x, y, x, y, "L", x, height(), "z"])
+    @bgpath.attr({path: bgpp}).toBack()
 
   height = ->
     innerHeight - 70

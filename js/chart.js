@@ -65,6 +65,7 @@
         this.innerCircle.attr({
           cy: Math.round(height() - Y * App.Model[this.data('index')])
         });
+        this.innerCircle.toFront();
         App.Model[this.data('index')] = Math.round(max - (this.attr('cy') / Y));
         $('#model').html(JSON.stringify(App.Model));
         return renderPath();
@@ -105,23 +106,32 @@
     };
 
     renderPath = function() {
-      var X, X0, X2, Y, Y0, Y2, a, i, max, p, x, y, _i, _ref, _ref1;
+      var X, X0, X2, Y, Y0, Y2, a, bgpp, i, max, p, x, y, _i, _ref, _ref1, _ref2;
       X = width() / App.Model.length;
       max = 100;
       Y = height() / max;
       if ((_ref = this.path) != null) {
         _ref.remove();
       }
+      if ((_ref1 = this.bgpath) != null) {
+        _ref1.remove();
+      }
       this.path = paper.path().attr({
         stroke: "#009874",
         "stroke-width": 4,
         "stroke-linejoin": "round"
       });
-      for (i = _i = 0, _ref1 = App.Model.length - 1; 0 <= _ref1 ? _i <= _ref1 : _i >= _ref1; i = 0 <= _ref1 ? ++_i : --_i) {
+      this.bgpath = paper.path().attr({
+        stroke: "none",
+        opacity: .3,
+        fill: "#009874"
+      });
+      for (i = _i = 0, _ref2 = App.Model.length - 1; 0 <= _ref2 ? _i <= _ref2 : _i >= _ref2; i = 0 <= _ref2 ? ++_i : --_i) {
         y = Math.round(height() - Y * App.Model[i]);
         x = Math.round(X * (i + .5));
         if (i === 0) {
           p = ["M", x, y, "C", x, y];
+          bgpp = ["M", X * .5, height(), "L", x, y, "C", x, y];
         }
         if (i !== 0 && i < App.Model.length - 1) {
           Y0 = Math.round(height() - Y * App.Model[i - 1]);
@@ -130,11 +140,16 @@
           X2 = Math.round(X * (i + 1.5));
           a = getAnchors(X0, Y0, x, y, X2, Y2);
           p = p.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
+          bgpp = bgpp.concat([a.x1, a.y1, x, y, a.x2, a.y2]);
         }
       }
       p = p.concat([x, y, x, y]);
-      return this.path.attr({
+      this.path.attr({
         path: p
+      }).toBack();
+      bgpp = bgpp.concat([x, y, x, y, "L", x, height(), "z"]);
+      return this.bgpath.attr({
+        path: bgpp
       }).toBack();
     };
 
