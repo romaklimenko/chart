@@ -67,6 +67,7 @@
         });
         this.innerCircle.toFront();
         App.Model[this.data('index')] = Math.round(max - (this.attr('cy') / Y));
+        localStorage['App.Model'] = JSON.stringify(App.Model);
         $('#model').html(JSON.stringify(App.Model));
         return renderPath();
       }, function() {

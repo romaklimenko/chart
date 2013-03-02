@@ -57,6 +57,7 @@ class App.Chart
           cy: Math.round(height() - Y * App.Model[@data('index')])
         @innerCircle.toFront()
         App.Model[@data('index')] = Math.round(max - (@attr('cy') / Y))
+        localStorage['App.Model'] = JSON.stringify(App.Model)
         $('#model').html(JSON.stringify(App.Model))
         renderPath()
       # onstart
